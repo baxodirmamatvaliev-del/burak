@@ -1,0 +1,44 @@
+{
+  "name": "burak",
+  "version": "1.0.0",
+  "description": "Burak Project Back-End",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "start:dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "train:dev": "nodemon --exec ts-node src/train.ts",
+    "train": "nodemon --exec python train.py",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LEO",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongodb-session": "^3.1.1",
+    "dotenv": "^16.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.3",
+    "express-session": "^1.17.3",
+    "kill-port": "^2.0.1",
+    "moment": "^2.30.1",
+    "mongodb": "^3.2.6",
+    "mongoose": "^6.2.9",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/connect-mongodb-session": "^2.4.7",
+    "@types/express": "^4.17.3",
+    "@types/express-session": "^1.17.10",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^25.9.1",
+    "@types/uuid": "^9.0.7",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  }
+}
