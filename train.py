@@ -1,4 +1,28 @@
 # npm run train!!!!!
+# TASK X
+
+def count_occurrences(obj, target_key):
+    count = 0
+
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if key == target_key:
+                count += 1
+
+            count += count_occurrences(value, target_key)
+
+    return count
+
+
+data = {
+    "model": "A",
+    "s": {
+        "model": "B"
+    }
+}
+
+print(count_occurrences(data, "model"))  # 2
+
 
 # TASK W
 
@@ -6,16 +30,16 @@
 
 # Masalan: chunkArray([1, 2, 3, 4, 5], 2) return [[1, 2], [3, 4], [5]]
 
-def chunkArray(a, size):
-    result = []
-    for chunk in range(0, len(a), size):
+# def chunkArray(a, size):
+#     result = []
+#     for chunk in range(0, len(a), size):
 
-        result.append(a[chunk:chunk+size])
+#         result.append(a[chunk:chunk+size])
 
-    return result
+#     return result
 
 
-print(chunkArray([1, 2, 3, 4, 5], 2))
+# print(chunkArray([1, 2, 3, 4, 5], 2))
 
 
 # TASK V
