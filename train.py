@@ -1,27 +1,37 @@
+# TASK Y
+def find_intersection(arr1, arr2):
+
+    return list(set(arr1) & set(arr2))
+
+
+
+print(find_intersection([1, 2, 3], [3, 2, 0]))  
+
+
 # npm run train!!!!!
 # TASK X
 
-def count_occurrences(obj, target_key):
-    count = 0
+# def count_occurrences(obj, target_key):
+#     count = 0
 
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            if key == target_key:
-                count += 1
+#     if isinstance(obj, dict):
+#         for key, value in obj.items():
+#             if key == target_key:
+#                 count += 1
 
-            count += count_occurrences(value, target_key)
+#             count += count_occurrences(value, target_key)
 
-    return count
+#     return count
 
 
-data = {
-    "model": "A",
-    "s": {
-        "model": "B"
-    }
-}
+# data = {
+#     "model": "A",
+#     "s": {
+#         "model": "B"
+#     }
+# }
 
-print(count_occurrences(data, "model"))  # 2
+# print(count_occurrences(data, "model"))  
 
 
 # TASK W
