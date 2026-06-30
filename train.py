@@ -1,11 +1,25 @@
+# TASK Z
+
+def sumEvens(arr):
+    result = 0
+
+    for num in arr:
+        if num % 2 == 0:
+            result += num
+
+    return result
+
+
+print(sumEvens([1, 2, 3]))  
+
 # TASK Y
-def find_intersection(arr1, arr2):
+# def find_intersection(arr1, arr2):
 
-    return list(set(arr1) & set(arr2))
+#     return list(set(arr1) & set(arr2))
 
 
 
-print(find_intersection([1, 2, 3], [3, 2, 0]))  
+# print(find_intersection([1, 2, 3], [3, 2, 0]))  
 
 
 # npm run train!!!!!
