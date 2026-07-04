@@ -11,7 +11,7 @@
     "train": "nodemon --exec python3 train.py",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "KEVIN",
+  "author": "LEO",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
