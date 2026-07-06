@@ -5,6 +5,8 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import { LoginInput, Member, MemberInput, MemberUpdateInput } from "../libs/types/member";
 import MemberModel from "../schema/Member.model";
 import * as bcrypt from 'bcryptjs'
+import { setHeapSnapshotNearHeapLimit } from "node:v8";
+import { exec } from "node:child_process";
 
 class MemberService {
     private readonly memberModel;
@@ -72,6 +74,21 @@ class MemberService {
         ).exec();
         if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND)
         return result
+    }
+
+
+    public async updateMember(member: Member,
+        input: MemberUpdateInput
+    ): Promise<Member>{
+      const memberId = shapeIntMongooseObjectId(member._id);
+      const result = await this.memberModel.
+      findByIdAndUpdate({_id: memberId}, input, {new: true})
+      .exec();
+
+      if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+    return  result
+
     }
 
 
