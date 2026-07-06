@@ -23,4 +23,6 @@ router.get
     memberController.updateMember
 );    
 
+router.get("/member/top-users", memberController.getTopUsers)
+
 export default router;
