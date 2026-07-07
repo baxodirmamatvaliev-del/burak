@@ -9,10 +9,26 @@ import { AUTH_TIMER } from '../libs/config';
 
 // SPA - REACT uchun 
 
-const memberController: T = {};
+
 
 const memberService = new MemberService();
 const authService = new AuthService();
+
+const memberController: T = {};
+
+memberController.getRestaurat = async (req: Request, res: Response) => {
+        try {
+        console.log("getRestaurat");
+        const result = await memberService.getRestaurat();
+
+        res.status(HttpCode.OK).json(result)
+       } catch (err) {
+        console.log("ERROR, getRestaurat:", err)
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standart.code).json(Errors.standart);
+        // res.json({})
+       }
+} 
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
