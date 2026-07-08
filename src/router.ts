@@ -24,8 +24,16 @@ router.get
     uploader("members").single("memberImage"),
     memberController.updateMember
 );    
+router.get("/member/top-users", memberController.getTopUsers);
+/**  Product */
+router.get("/product/all", productController.getProducts);
+router.get("/product/:id", 
+    memberController.retrieveAuth,
+     productController.getProduct
+    );
 
-router.get("/member/top-users", memberController.getTopUsers)
-router.get("/product/all", productController.getProducts)
+
+
+/**  Order */
 
 export default router;

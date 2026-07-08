@@ -4,6 +4,7 @@ import { shapeIntMongooseObjectId } from "../libs/config";
 import ProductModel from "../schema/Product.model";
 import { T } from "../libs/types/common";
 import { ProductStatus } from "../libs/enums/product.enum";
+import { ObjectId } from "mongoose";
 
 
 class ProductService {
@@ -37,9 +38,26 @@ class ProductService {
         { $skip: (inquiry.page*1 -1)*inquiry.limit },  // nechtadir malumotni otkazish. (0)
         { $limit: inquiry.limit *1 },                  // limit 3 ta malumotni olib ber
      ]).exec();
-     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND) 
+
+     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
     return result;
    }
+
+   public async getProduct(memberId: ObjectId | null, id: string ): Promise<Product> {
+     const productId = shapeIntMongooseObjectId(id);
+
+     let result = await this.productModel.findOne
+     ({_id: productId, productStatus: ProductStatus.PROCESS})
+     .exec();
+
+     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+     //TODO: if authenticated users => first => view log creation 
+
+     return result;
+   }
+
 
     /* SSR */
 
@@ -80,4 +98,8 @@ class ProductService {
 
 
 export default ProductService;
+
+function getProduct() {
+    throw new Error("Function not implemented.");
+}
 
