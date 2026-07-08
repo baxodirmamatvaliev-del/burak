@@ -16,6 +16,13 @@ export interface Product {
 
 }
 
+export interface ProductInquiry {
+    order: string;
+    page: number;
+    limit: number;
+    productCollection?: ProductCollection;
+    search?: string; 
+}
 
 export interface ProductInput {
     productStatus?: ProductStatus;

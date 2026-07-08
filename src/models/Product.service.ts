@@ -1,7 +1,9 @@
 import Errors, { HttpCode, Message } from "../libs/Errors";
-import { Product, ProductInput, ProductUpdateInput } from "../libs/types/product";
+import { Product, ProductInput, ProductInquiry, ProductUpdateInput } from "../libs/types/product";
 import { shapeIntMongooseObjectId } from "../libs/config";
 import ProductModel from "../schema/Product.model";
+import { T } from "../libs/types/common";
+import { ProductStatus } from "../libs/enums/product.enum";
 
 
 class ProductService {
@@ -13,7 +15,31 @@ class ProductService {
     /* SPA */
 
 
+   public async getProducts(inquiry: ProductInquiry): Promise<Product[]> {
+    console.log("inquiry:", inquiry);
+    const match: T = {ProductStatus: ProductStatus.PROCESS}
 
+    if(inquiry.productCollection) 
+        match.productCollection = inquiry.productCollection;
+    if(inquiry.search) {
+        match.productName = {$regex: new RegExp(inquiry.search,"i")}
+    }
+
+    const sort: T = 
+    inquiry.order === 
+    "productPrice" ?     // narxi eng arzon bolgan narxdan yuqori bolgan productni olib ber degani!
+     {[inquiry.order]: 1} :  // [] <--- stringni key ga aylantirib berar ekan.
+     {[inquiry.order]: -1};
+
+     const result = await this.productModel.aggregate([
+        { $match: match }, // PROCESS da bolgan productni topib ber!
+        { $sort: sort },
+        { $skip: (inquiry.page*1 -1)*inquiry.limit },  // nechtadir malumotni otkazish. (0)
+        { $limit: inquiry.limit *1 },                  // limit 3 ta malumotni olib ber
+     ]).exec();
+     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND) 
+    return result;
+   }
 
     /* SSR */
 

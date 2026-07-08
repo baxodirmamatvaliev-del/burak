@@ -2,12 +2,45 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import { T } from "../libs/types/common";
 import { Request, Response } from 'express';
 import ProductService from "../models/Product.service";
-import { ProductInput } from "../libs/types/product";
+import { ProductInput, ProductInquiry } from "../libs/types/product";
 import { AdminRequest } from "../libs/types/member";
+import { ProductCollection } from "../libs/enums/product.enum";
 // import { AdminRequest } from "../libs/types/member";
 
-const productController: T = {};
 const productService = new ProductService;
+const productController: T = {};
+
+// SPA
+productController.getProducts = async ( req: Request,  res: Response) => {
+     try {
+        console.log("getProducts");
+        // const query = req.query;
+        // console.log("req.query:", query);   //QISQACHA: // Query URL orqali serverga nima kerakligini aytish
+
+        // const params = req.params;
+        // console.log("req.params:",params)
+
+
+        const { page, limit, order, productCollection, search} = req.query;
+        const inquiry: ProductInquiry = {
+            order: String(order),
+            page: Number(page),
+            limit: Number(limit)
+        };
+      if(productCollection) inquiry.productCollection = productCollection as ProductCollection;
+      if(search) inquiry.search = String(search);
+      const result = await productService.getProducts(inquiry)
+
+      res.status(HttpCode.OK).json(result);
+    } catch (err) {
+        console.log("ERROR, getProducts:", err)
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standart.code).json(Errors.standart);
+    }
+}
+
+// SSR
+
 
 productController.getAllProducts = async (req: Request, res: Response) => {
     try {
