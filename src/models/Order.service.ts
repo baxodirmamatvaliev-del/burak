@@ -2,20 +2,23 @@ import { shapeIntMongooseObjectId } from "../libs/config";
 import { OrderStatus } from "../libs/enums/order.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { Member } from "../libs/types/member";
-import { Order, OrderInquiry, OrderItemInput } from "../libs/types/order";
+import { Order, OrderInquiry, OrderItemInput, OrderUpdateInput } from "../libs/types/order";
 import OrderModel from "../schema/Order.model";
 import OrderItemModel from "../schema/OrderItem.model";
 import {ObjectId} from "mongoose"
+import MemberService from "./Member.service";
 
 
 
  class OrderService {
     private readonly orderModel;
     private readonly orderItemModel;
+    private readonly memberService;
 
     constructor(){
         this.orderModel = OrderModel;
         this.orderItemModel = OrderItemModel;
+        this.memberService = new MemberService();
     }
 
    public async createOrder(
@@ -70,7 +73,7 @@ import {ObjectId} from "mongoose"
     inquiry: OrderInquiry
    ): Promise<Order[]>{
     const memberId = shapeIntMongooseObjectId(members._id);
-    const matches = {memberId: memberId, orderStatus: inquiry.orderStatus}; // jarayondagi orderlarni chiqarishni talab qilamiz!
+    const matches = {memberId: memberId, orderStatus: inquiry.orderStatus}; // jarayondagi orderlarni chiqarishni talab qilamiz!, req qilayotgan memberni statusi PAUSE bolgan orderlarni topib ber!
 
     const result = await this.orderModel.aggregate([
         { $match: matches },
@@ -98,6 +101,34 @@ import {ObjectId} from "mongoose"
     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     return result; 
+   }
+
+
+   public async updateOrder(
+    member: Member, 
+    input: OrderUpdateInput
+   ): Promise<Order>{
+   const memberId =shapeIntMongooseObjectId(member._id),
+   orderId = shapeIntMongooseObjectId(input.orderId),
+   orderStatus = input.orderStatus;
+
+
+   const result = await this.orderModel.findByIdAndUpdate({
+    memberId: memberId, 
+    _id: orderId,
+   },
+   {orderStatus: orderStatus},
+   { new: true}
+   )
+    .exec();
+    if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+    if(orderStatus === OrderStatus.PROCESS) { // PAUSES dan ~ PROCESS ga otayotgan bolsa , user pointini 1 ga oshirramiz:
+        await this.memberService.addUserPoint(member, 1)
+    }
+    
+    return result;
+
    }
     
  }
