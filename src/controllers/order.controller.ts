@@ -27,9 +27,10 @@ orderController.createOrder = async (req: ExtendedRequest , res: Response) => {
 orderController.getMyOrders = async (req: ExtendedRequest , res: Response) => {
     try {
      console.log("getMyOrders");
-     const {page, limit, orderStatus} = req.query;
+     const {page, limit, orderStatus} = req.query;  // object destructuring,
      console.log("req.query:", req.query);
     const inquiry: OrderInquiry = {       // Stringni number ga otkazyapmiz malumotlar stringda kelgani uchun:
+                                         // inquiry nomli constantamiz bor, unga OrderInquiry interface orqali type berilyapti.
         page: Number(page),
         limit: Number(limit),
         orderStatus: orderStatus as OrderStatus

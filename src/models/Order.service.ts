@@ -9,7 +9,6 @@ import {ObjectId} from "mongoose"
 import MemberService from "./Member.service";
 
 
-
  class OrderService {
     private readonly orderModel;
     private readonly orderItemModel;
@@ -64,7 +63,7 @@ import MemberService from "./Member.service";
      });
    
      console.log("promisedLisd:", promisedList)
-     const orderItemsStae = await Promise.all(promisedList)
+     const orderItemsStae = await Promise.all(promisedList) //  Promise.all yozilishi tayyor lekin dataBS ga yozilmagan malumotni yozib beradi.
 
    }
 
@@ -73,15 +72,16 @@ import MemberService from "./Member.service";
     inquiry: OrderInquiry
    ): Promise<Order[]>{
     const memberId = shapeIntMongooseObjectId(members._id);
-    const matches = {memberId: memberId, orderStatus: inquiry.orderStatus}; // jarayondagi orderlarni chiqarishni talab qilamiz!, req qilayotgan memberni statusi PAUSE bolgan orderlarni topib ber!
+    const matches = {memberId: memberId, orderStatus: inquiry.orderStatus}; 
+    // jarayondagi orderlarni chiqarishni talab qilamiz!, req qilayotgan memberni statusi PAUSE bolgan orderlarni topib ber!
 
     const result = await this.orderModel.aggregate([
-        { $match: matches },
+        { $match: matches }, //$match bilan user va status bo‘yicha filter qilyapmiz
         { $sort: {updateAt: -1} }, // eng oxirgi ozgarish bolganlarni yuqorida korsat deyapmiz:
-        { $skip: (inquiry.page -1)*inquiry.limit},
-        { $limit: inquiry.limit },
+        { $skip: (inquiry.page -1)*inquiry.limit}, // Bu pagination uchun,,$skip orqali oldingi page’dagi ma’lumotlarni tashlab ketamiz.
+        { $limit: inquiry.limit },       // $limit orqali bitta page’da nechta order chiqishini belgilaymiz.
         {
-            $lookup: {
+            $lookup: {       // $lookup orqali orderga tegishli orderItemslarni qo‘shyapmiz. Ya’ni orders._id bilan orderItems.orderId ni bog‘layapmiz.
                 from: "orderItems",
                 localField: "_id",
                 foreignField: "orderId",
@@ -89,7 +89,7 @@ import MemberService from "./Member.service";
             },
         },
         {
-            $lookup: {
+            $lookup: {    // Umumiy2 : $lookup MongoDB’da join vazifasini bajaradi. Biz orderni, uning itemlarini va product ma’lumotlarini birlashtirib frontendga to‘liq order detail qaytaryapmiz. 
                 from: "products",
                 localField: "orderItems.productId",
                 foreignField: "_id",
