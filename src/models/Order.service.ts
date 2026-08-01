@@ -77,7 +77,7 @@ import MemberService from "./Member.service";
 
     const result = await this.orderModel.aggregate([
         { $match: matches }, //$match bilan user va status bo‘yicha filter qilyapmiz
-        { $sort: {updateAt: -1} }, // eng oxirgi ozgarish bolganlarni yuqorida korsat deyapmiz:
+        { $sort: {updatedAt: -1} }, // eng oxirgi ozgarish bolganlarni yuqorida korsat deyapmiz:
         { $skip: (inquiry.page -1)*inquiry.limit}, // Bu pagination uchun,,$skip orqali oldingi page’dagi ma’lumotlarni tashlab ketamiz.
         { $limit: inquiry.limit },       // $limit orqali bitta page’da nechta order chiqishini belgilaymiz.
         {

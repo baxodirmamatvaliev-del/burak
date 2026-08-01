@@ -8,27 +8,31 @@ import AuthService from '../models/Auth.service';
 import { AUTH_TIMER } from '../libs/config';
 
 // SPA - REACT uchun 
-
-
+const memberController: T = {};
 
 const memberService = new MemberService();
 const authService = new AuthService();
 
-const memberController: T = {};
 
-memberController.getRestaurat = async (req: Request, res: Response) => {
-        try {
-        console.log("getRestaurat");
+
+
+
+memberController.getRestaurant = async (req: Request, res: Response) => {
+    try {
+        console.log("getRestaurant");
         const result = await memberService.getRestaurat();
 
         res.status(HttpCode.OK).json(result)
-       } catch (err) {
-        console.log("ERROR, getRestaurat:", err)
+    } catch (err) {
+        console.log("ERROR, getRestaurant:", err);
         if (err instanceof Errors) res.status(err.code).json(err);
         else res.status(Errors.standart.code).json(Errors.standart);
-        // res.json({})
-       }
-} 
+    }
+}
+
+
+
+
 
 memberController.signup = async (req: Request, res: Response) => {
     try {
@@ -104,33 +108,45 @@ memberController.getMemberDetail = async (req: ExtendedRequest, res: Response) =
     }
 }
 
-memberController.updateMember = async (req: ExtendedRequest , res: Response) => {
-    try {
-        console.log("updateMembert");
-        const input: MemberUpdateInput  = req.body;
-        if(req.file) input.memberImage = req.file.path.replace(/\\/, "/") // client dan file - image larni shu orqari olamiz 
-        const result = await memberService.updateMember(req.member,input)
 
-       res.status(HttpCode.OK).json(result);
-    } catch (err) {
+memberController.updateMember = async (req: ExtendedRequest, res: Response) => {
+    try {
+        console.log("updateMember");
+
+        const input: MemberUpdateInput = req.body
+        console.log('====================================');
+        console.log(input);
+        console.log('====================================');
+
+        if (req.file) input.memberImage = req.file.path.replace(/\\/g, '/');
+
+        const result = await memberService.updateMember(req.member, input)
+
+        res.status(HttpCode.OK).json(result)
+
+
+ } catch (err) {
         console.log("ERROR, updateMember:", err);
         if (err instanceof Errors) res.status(err.code).json(err);
         else res.status(Errors.standart.code).json(Errors.standart);
     }
 }
 
-memberController.getTopUsers =async (req: Request , res: Response) => {
-        try {
-        console.log("getTopUsers");
-       const result = await memberService.getTopUsers();
 
-       res.status(HttpCode.OK).json(result)
+memberController.getTopUsers = async (req: Request, res: Response) => {
+    try {
+        console.log("getTopUsers");
+
+        const result = await memberService.getTopUsers();
+
+        res.status(HttpCode.OK).json(result)
     } catch (err) {
         console.log("ERROR, getTopUsers:", err);
         if (err instanceof Errors) res.status(err.code).json(err);
         else res.status(Errors.standart.code).json(Errors.standart);
     }
 }
+
 
 
 
@@ -176,4 +192,4 @@ memberController.retrieveAuth = async (req: ExtendedRequest, res: Response, next
 
 
 
-export default memberController;
+export default memberController;       
