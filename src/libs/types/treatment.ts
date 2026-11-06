@@ -20,6 +20,11 @@ export interface TreatmentInput {
     treatmentDuration: number;
 }
 
+export interface TreatmentInquiry {
+    page: number;
+    limit: number;
+}
+
 export interface TreatmentUpdateInput {
     _id: ObjectId;
     treatmentStatus?: TreatmentStatus;

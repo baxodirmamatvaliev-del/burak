@@ -11,6 +11,7 @@
 - Frontend: follow the existing component, service, state, and styling conventions.
 - Reuse existing methods and components before creating new ones.
 - Do not copy existing bugs or insecure behavior.
+- Add a short Uzbek comment above each API route and its controller and service methods. Explain what that specific layer does. For models/schemas, briefly explain what data they store. Avoid repeating identical comments.
 
 ## Scope
 - Implement only the requested step.
@@ -35,3 +36,11 @@
 - Do not continue, skip, or abort a rebase without user instruction.
 - Never expose credentials, tokens, or .env contents.
 - Never stage or commit .env files.
+
+Update the comment rule in both AGENTS.md files:
+
+"Add a short Uzbek comment above each API route and its controller and service methods. Explain what that specific layer does. For models/schemas, briefly explain what data they store. Avoid repeating identical comments."
+
+Apply this rule to the treatment code already created. Change comments only; preserve behavior.
+
+Do not commit or push. Suggest a short English commit message.

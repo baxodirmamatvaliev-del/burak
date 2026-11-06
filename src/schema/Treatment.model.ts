@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { TreatmentStatus } from "../libs/enums/treatment.enum";
 
+// Davolash nomi, tavsifi, rasmlari, holati va daqiqalardagi davomiyligini saqlash
 const treatmentSchema = new Schema(
     {
         treatmentStatus: {

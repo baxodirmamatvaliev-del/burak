@@ -15,6 +15,8 @@ export enum Message {
     CREATE_FAILED = "Create is failed!",
     UPDATE_FAILED = "Update is failed!",
     INVALID_PRODUCT_QUERY = "Invalid product query",
+    INVALID_TREATMENT_QUERY = "Invalid treatment query",
+    INVALID_TREATMENT_ID = "Invalid treatment ID",
 
     USED_NICK_PHONE = "You are inserting already used nick or phone!",
     NO_MEMBER_NICK = "No member with that member nick!",

@@ -4,6 +4,7 @@ import memberController from './controllers/member.controller'
 import makeUploader from './libs/utils/uploader';
 import productController from './controllers/product.controller';
 import orderController from './controllers/order.controller';
+import treatmentController from './controllers/treatment.controller';
 
 router.get("/");
 
@@ -38,6 +39,12 @@ router.get("/member/top-users", memberController.getTopUsers);
 router.get("/product/all", productController.getProducts);
 
 router.get("/product/:id", memberController.retrieveAuth, productController.getProduct);
+
+/** Treatment */
+// Ro'yxat so'rovini davolash controlleriga yo'naltirish
+router.get("/treatment/all", treatmentController.getTreatments);
+// Tafsilot so'rovini davolash controlleriga yo'naltirish
+router.get("/treatment/:id?", treatmentController.getTreatment);
 
 /** Order */
 router.post("/order/create", memberController.verifyAuth, orderController.createOrder);
