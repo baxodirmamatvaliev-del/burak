@@ -21,6 +21,27 @@ const store = new MongoDBStore({
 /** 1-ENTRANCE **/
 const app = express();
 console.log("__dirname:", __dirname);
+app.use(function (req, res, next) {
+    const origin = req.get("Origin");
+    const allowedOrigins = ["http://127.0.0.1:3000", "http://localhost:3000"];
+    res.vary("Origin");
+
+    if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        if (req.method === "OPTIONS") {
+            res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,PATCH,DELETE");
+            res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+            res.sendStatus(204);
+            return;
+        }
+    } else if (origin && req.method === "OPTIONS") {
+        res.sendStatus(403);
+        return;
+    }
+
+    next();
+});
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

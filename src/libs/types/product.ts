@@ -2,6 +2,14 @@ import { ObjectId } from "mongoose";
 
 import { ProductCollection, ProductSize, ProductStatus } from "../enums/product.enum";
 
+export interface ProductInquiry {
+    page?: string;
+    limit?: string;
+    order?: string;
+    productCollection?: ProductCollection;
+    search?: string;
+}
+
 export interface Product {
     _id: ObjectId;
     productStatus: ProductStatus;

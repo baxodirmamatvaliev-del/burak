@@ -17,6 +17,18 @@ class MemberService {
   }
 
   /*SPA */
+  public async getTopUsers(): Promise<Member[]> {
+    const result = await this.memberModel
+      .find(
+        { memberType: MemberType.USER, memberStatus: MemberStatus.ACTIVE },
+        { memberNick: 1, memberImage: 1, memberPoints: 1 },
+      )
+      .sort({ memberPoints: -1, _id: 1 })
+      .limit(4)
+      .exec();
+    return result;
+  }
+
   public async signup(input: MemberInput): Promise<Member> {
     const salt = await bcrypt.genSalt();
     input.memberPassword = await bcrypt.hash(input.memberPassword, salt);
