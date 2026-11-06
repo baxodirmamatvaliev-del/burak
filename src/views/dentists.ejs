@@ -15,6 +15,7 @@
                 <th>Name</th>
                 <th>Specialty</th>
                 <th>Status</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody style="background: white">
@@ -24,10 +25,11 @@
                   <td><%= dentist.dentistName %></td>
                   <td><%= dentist.dentistSpecialty %></td>
                   <td><%= dentist.dentistStatus %></td>
+                  <td><a class="btn btn-primary btn-sm" href="/admin/dentist/<%= dentist._id %>">Edit</a></td>
                 </tr>
               <% }) %>
               <% if (!dentists.length) { %>
-                <tr><td colspan="4">No dentists yet.</td></tr>
+                <tr><td colspan="5">No dentists yet.</td></tr>
               <% } %>
             </tbody>
           </table>

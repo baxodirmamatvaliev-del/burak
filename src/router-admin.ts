@@ -53,5 +53,10 @@ routerAdmin.get("/dentist/create", restaurantController.verifyRestaurant, dentis
 // Rasm yuklash va stomatolog yaratishdan oldin admin huquqini tekshirish
 routerAdmin.post("/dentist/create", restaurantController.verifyRestaurant,
     dentistController.uploadDentistImage, dentistController.createNewDentist);
+// Tahrirlash formasini faqat admin uchun ochish
+routerAdmin.get("/dentist/:id", restaurantController.verifyRestaurant, dentistController.getEditDentist);
+// Profil va rasmni yangilashdan oldin admin huquqini tekshirish
+routerAdmin.post("/dentist/:id", restaurantController.verifyRestaurant,
+    dentistController.uploadDentistImage, dentistController.updateChosenDentist);
 
 export default routerAdmin;

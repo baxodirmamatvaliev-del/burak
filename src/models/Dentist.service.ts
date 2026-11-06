@@ -1,7 +1,7 @@
 import { shapeIntMongooseObjectId } from "../libs/config";
 import { DentistStatus } from "../libs/enums/dentist.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
-import { Dentist, DentistInput, DentistInquiry, DentistProfile } from "../libs/types/dentist";
+import { Dentist, DentistInput, DentistInquiry, DentistProfile, DentistUpdateInput } from "../libs/types/dentist";
 import DentistModel from "../schema/Dentist.model";
 import TreatmentModel from "../schema/Treatment.model";
 import { isObjectIdOrHexString } from "mongoose";
@@ -47,10 +47,71 @@ class DentistService {
 
     // Ruxsat etilgan maydonlar va davolash havolalarini tekshirib, stomatolog yaratish
     public async createNewDentist(input: DentistInput): Promise<Dentist> {
+        const data = await this.validateDentistInput(input);
+        try {
+            return await this.dentistModel.create(data);
+        } catch (err) {
+            throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+        }
+    }
+
+    // Admin tahriri uchun stomatologni holatidan qat'i nazar olish
+    public async getChosenDentist(id: string): Promise<Dentist> {
+        const dentistId = this.getDentistId(id);
+        const result = await this.dentistModel.findById(dentistId).lean<Dentist>().exec();
+        if (!result) {
+            throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        }
+        return result;
+    }
+
+    // Tekshirilgan o'zgarishlarni saqlab, yuborilmagan rasmni o'z holida qoldirish
+    public async updateChosenDentist(id: string, input: DentistUpdateInput): Promise<Dentist> {
+        const dentistId = this.getDentistId(id);
+        const data = await this.validateDentistInput(input);
+        const result = await this.dentistModel.findOneAndUpdate(
+            { _id: dentistId },
+            { $set: data },
+            { new: true, runValidators: true },
+        ).exec();
+        if (!result) {
+            throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        }
+        return result;
+    }
+
+    // ID ni tekshirib, faqat faol stomatologning ommaviy profilini olish
+    public async getDentist(id: string): Promise<DentistProfile> {
+        const dentistId = this.getDentistId(id);
+        const result = await this.dentistModel
+            .findOne({ _id: dentistId, dentistStatus: DentistStatus.ACTIVE })
+            .select(publicProfileFields)
+            .lean<DentistProfile>()
+            .exec();
+        if (!result) {
+            throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        }
+
+        return result;
+    }
+
+    // Stomatolog ID sini tekshirib, MongoDB identifikatoriga aylantirish
+    private getDentistId(id: string) {
+        if (typeof id !== "string" || !/^[a-fA-F0-9]{24}$/.test(id)) {
+            throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_ID);
+        }
+        return shapeIntMongooseObjectId(id);
+    }
+
+    // Yaratish va tahrirlashdagi maydonlar hamda davolash havolalarini bir joyda tekshirish
+    private async validateDentistInput(input: DentistInput | DentistUpdateInput): Promise<DentistUpdateInput> {
         const allowedFields = [
             "dentistName", "dentistSpecialty", "dentistIntro", "dentistStatus", "dentistImage", "treatmentIds",
         ];
         if (!input || typeof input !== "object" || Array.isArray(input)) {
+            throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_INPUT);
+        }
+        if (!Object.keys(input).length) {
             throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_INPUT);
         }
         for (const field of Object.keys(input)) {
@@ -58,12 +119,15 @@ class DentistService {
                 throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_INPUT);
             }
         }
+        const data: DentistUpdateInput = { ...input };
         for (const field of ["dentistName", "dentistSpecialty", "dentistIntro"] as const) {
-            const value = input[field];
-            if (typeof value !== "string" || !value.trim()) {
-                throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_INPUT);
+            if (field in input) {
+                const value = input[field];
+                if (typeof value !== "string" || !value.trim()) {
+                    throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_INPUT);
+                }
+                data[field] = value.trim();
             }
-            input[field] = value.trim();
         }
         if ("dentistStatus" in input) {
             const status = input.dentistStatus;
@@ -78,7 +142,10 @@ class DentistService {
             }
         }
 
-        const references = input.treatmentIds === undefined ? [] : input.treatmentIds;
+        if (!("treatmentIds" in input)) {
+            return data;
+        }
+        const references = input.treatmentIds;
         if (!Array.isArray(references)) {
             throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_TREATMENTS);
         }
@@ -99,30 +166,8 @@ class DentistService {
             }
         }
 
-        try {
-            return await this.dentistModel.create({ ...input, treatmentIds });
-        } catch (err) {
-            throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
-        }
-    }
-
-    // ID ni tekshirib, faqat faol stomatologning ommaviy profilini olish
-    public async getDentist(id: string): Promise<DentistProfile> {
-        if (typeof id !== "string" || !/^[a-fA-F0-9]{24}$/.test(id)) {
-            throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_DENTIST_ID);
-        }
-
-        const dentistId = shapeIntMongooseObjectId(id);
-        const result = await this.dentistModel
-            .findOne({ _id: dentistId, dentistStatus: DentistStatus.ACTIVE })
-            .select(publicProfileFields)
-            .lean<DentistProfile>()
-            .exec();
-        if (!result) {
-            throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
-        }
-
-        return result;
+        data.treatmentIds = treatmentIds;
+        return data;
     }
 }
 

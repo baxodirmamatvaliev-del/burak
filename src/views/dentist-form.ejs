@@ -7,10 +7,11 @@
     <%- include('includes/treatment-navigation', { activePage: 'dentists' }) %>
     <div class="restaurant-menu-frame">
       <div class="board">
-        <form class="dish-container" style="display: flex" action="/admin/dentist/create"
+        <form class="dish-container" style="display: flex"
+          action="<%= dentistId ? '/admin/dentist/' + encodeURIComponent(dentistId) : '/admin/dentist/create' %>"
           method="POST" enctype="multipart/form-data">
           <div class="long-input" style="align-items: center">
-            <span class="new-dish-txt">NEW DENTIST / 의료진 등록</span>
+            <span class="new-dish-txt"><%= dentistId ? 'EDIT DENTIST / 의료진 수정' : 'NEW DENTIST / 의료진 등록' %></span>
           </div>
           <% if (message) { %>
             <div class="alert alert-danger" role="alert"><%= message %></div>
@@ -38,6 +39,9 @@
           </div>
           <div class="long-input">
             <label for="dentist-image">Optional profile image: JPG/PNG, up to 5 MB</label>
+            <% if (dentistId) { %>
+              <p class="text-light">Leave empty to keep the current profile image.</p>
+            <% } %>
             <input id="dentist-image" name="dentistImage" type="file" accept="image/jpeg,image/png" />
           </div>
           <div class="long-input">
@@ -55,7 +59,7 @@
           </div>
           <div class="operation-buttons">
             <a class="btn btn-danger" href="/admin/dentist/all">Cancel</a>
-            <button class="btn btn-primary" type="submit">Create</button>
+            <button class="btn btn-primary" type="submit"><%= dentistId ? 'Save' : 'Create' %></button>
           </div>
         </form>
       </div>
