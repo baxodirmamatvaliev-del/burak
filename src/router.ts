@@ -5,6 +5,7 @@ import makeUploader from './libs/utils/uploader';
 import productController from './controllers/product.controller';
 import orderController from './controllers/order.controller';
 import treatmentController from './controllers/treatment.controller';
+import dentistController from './controllers/dentist.controller';
 
 router.get("/");
 
@@ -45,6 +46,12 @@ router.get("/product/:id", memberController.retrieveAuth, productController.getP
 router.get("/treatment/all", treatmentController.getTreatments);
 // Tafsilot so'rovini davolash controlleriga yo'naltirish
 router.get("/treatment/:id?", treatmentController.getTreatment);
+
+/** Dentist */
+// Ro'yxat so'rovini stomatolog controlleriga yo'naltirish
+router.get("/dentist/all", dentistController.getDentists);
+// Profil tafsilotlari so'rovini stomatolog controlleriga yo'naltirish
+router.get("/dentist/:id?", dentistController.getDentist);
 
 /** Order */
 router.post("/order/create", memberController.verifyAuth, orderController.createOrder);

@@ -22,6 +22,19 @@ export interface DentistInput {
     treatmentIds?: ObjectId[];
 }
 
+export interface DentistInquiry {
+    page: number;
+    limit: number;
+}
+
+export type DentistProfile = Pick<Dentist,
+    "_id" | "dentistName" | 
+    "dentistSpecialty" | 
+    "dentistIntro" |
+     "dentistImage" | 
+     "treatmentIds"
+>;
+
 export interface DentistUpdateInput {
     dentistStatus?: DentistStatus;
     dentistName?: string;
