@@ -3,6 +3,7 @@ import path from 'path';
 import router from './router';
 import routerAdmin from "./router-admin";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import { MORGAN_FORMAT } from "./libs/config";
 
 
@@ -23,6 +24,7 @@ console.log("__dirname:", __dirname);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(morgan(MORGAN_FORMAT));
 
 /** 2-SESSIONS **/
@@ -51,4 +53,4 @@ app.set("view engine", "ejs");
 app.use('/admin', routerAdmin); // SSR
 app.use("/", router) //REACT    // SPA: React 1- burak bssr di react loyihamizga rest api server sifatida ishlatamiz
     // SSR: EJS  2- adminka loyihamizdi qurish maqsadida ham ishlatamiz!
-export default app;  // 
+export default app;

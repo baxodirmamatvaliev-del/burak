@@ -1,7 +1,9 @@
 export const AUTH_TIMER = 24;
 export const MORGAN_FORMAT = `:method :url :response-time [:status] \n`;
 
-import mongoose from "mongoose";
 export const shapeIntoMongooseObjectId = (target: any) => {
-    return typeof target === 'string' ? new mongoose.Types.ObjectId(target) : target;
+    if (typeof target !== "string") return target;
+
+    const mongoose = require("mongoose");
+    return new mongoose.Types.ObjectId(target);
 };
