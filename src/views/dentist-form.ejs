@@ -1,0 +1,65 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" type="text/css" href="/css/products.css" />
+<% const selectedIds = Array.isArray(dentist.treatmentIds) ? dentist.treatmentIds : []; %>
+
+<body>
+  <div class="products-container">
+    <%- include('includes/treatment-navigation', { activePage: 'dentists' }) %>
+    <div class="restaurant-menu-frame">
+      <div class="board">
+        <form class="dish-container" style="display: flex" action="/admin/dentist/create"
+          method="POST" enctype="multipart/form-data">
+          <div class="long-input" style="align-items: center">
+            <span class="new-dish-txt">NEW DENTIST / 의료진 등록</span>
+          </div>
+          <% if (message) { %>
+            <div class="alert alert-danger" role="alert"><%= message %></div>
+          <% } %>
+          <div class="long-input">
+            <label for="dentist-name">Name / 이름</label>
+            <input id="dentist-name" name="dentistName" required
+              value="<%= typeof dentist.dentistName === 'string' ? dentist.dentistName : '' %>" />
+          </div>
+          <div class="long-input">
+            <label for="dentist-specialty">Specialty / 전문 분야</label>
+            <input id="dentist-specialty" name="dentistSpecialty" required
+              value="<%= typeof dentist.dentistSpecialty === 'string' ? dentist.dentistSpecialty : '' %>" />
+          </div>
+          <div class="long-input">
+            <label for="dentist-intro">Introduction / 소개</label>
+            <textarea id="dentist-intro" name="dentistIntro" required><%= typeof dentist.dentistIntro === 'string' ? dentist.dentistIntro : '' %></textarea>
+          </div>
+          <div class="long-input">
+            <label for="dentist-status">Status / 상태</label>
+            <select id="dentist-status" name="dentistStatus" required>
+              <option value="ACTIVE" <%= dentist.dentistStatus === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
+              <option value="INACTIVE" <%= dentist.dentistStatus === 'INACTIVE' ? 'selected' : '' %>>INACTIVE</option>
+            </select>
+          </div>
+          <div class="long-input">
+            <label for="dentist-image">Optional profile image: JPG/PNG, up to 5 MB</label>
+            <input id="dentist-image" name="dentistImage" type="file" accept="image/jpeg,image/png" />
+          </div>
+          <div class="long-input">
+            <label for="dentist-treatments">Treatments / 진료 항목</label>
+            <select id="dentist-treatments" name="treatmentIds" multiple size="5" style="height: auto">
+              <% treatments.forEach(function(treatment) { %>
+                <option value="<%= treatment._id %>" <%= selectedIds.includes(String(treatment._id)) ? 'selected' : '' %>>
+                  <%= treatment.treatmentName %> (<%= treatment.treatmentStatus %>)
+                </option>
+              <% }) %>
+            </select>
+            <% if (!treatments.length) { %>
+              <p class="text-light">No treatments available.</p>
+            <% } %>
+          </div>
+          <div class="operation-buttons">
+            <a class="btn btn-danger" href="/admin/dentist/all">Cancel</a>
+            <button class="btn btn-primary" type="submit">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+<%- include('includes/footer') %>

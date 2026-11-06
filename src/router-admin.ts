@@ -48,5 +48,10 @@ routerAdmin.post("/treatment/:id", restaurantController.verifyRestaurant,
 /* Dentist */
 // Stomatologlar jadvalini faqat autentifikatsiyadan o'tgan admin uchun ochish
 routerAdmin.get("/dentist/all", restaurantController.verifyRestaurant, dentistController.getAllDentists);
+// Yaratish formasini faqat admin uchun ochish
+routerAdmin.get("/dentist/create", restaurantController.verifyRestaurant, dentistController.getCreateDentist);
+// Rasm yuklash va stomatolog yaratishdan oldin admin huquqini tekshirish
+routerAdmin.post("/dentist/create", restaurantController.verifyRestaurant,
+    dentistController.uploadDentistImage, dentistController.createNewDentist);
 
 export default routerAdmin;
