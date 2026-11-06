@@ -26,7 +26,6 @@ export interface TreatmentInquiry {
 }
 
 export interface TreatmentUpdateInput {
-    _id: ObjectId;
     treatmentStatus?: TreatmentStatus;
     treatmentName?: string;
     treatmentDesc?: string;

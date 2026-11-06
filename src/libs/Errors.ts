@@ -17,6 +17,8 @@ export enum Message {
     INVALID_PRODUCT_QUERY = "Invalid product query",
     INVALID_TREATMENT_QUERY = "Invalid treatment query",
     INVALID_TREATMENT_ID = "Invalid treatment ID",
+    INVALID_TREATMENT_INPUT = "Invalid treatment details",
+    INVALID_TREATMENT_IMAGE = "Upload up to five JPG or PNG images, at most 5 MB each",
 
     USED_NICK_PHONE = "You are inserting already used nick or phone!",
     NO_MEMBER_NICK = "No member with that member nick!",

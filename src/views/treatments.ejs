@@ -1,0 +1,46 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" type="text/css" href="/css/products.css" />
+
+<body>
+  <div class="products-container">
+    <%- include('includes/treatment-navigation') %>
+    <div class="restaurant-menu-frame">
+      <div class="board">
+        <div class="dishes-table">
+          <span class="new-dish-txt" style="margin-bottom: 30px">TREATMENTS / 진료 관리</span>
+          <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+              <tr>
+                <th>No</th>
+                <th>Korean name</th>
+                <th>Description</th>
+                <th>Minutes</th>
+                <th>Status</th>
+                <th>Edit</th>
+              </tr>
+            </thead>
+            <tbody style="background: white">
+              <% treatments.forEach(function(treatment, index) { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= treatment.treatmentName %></td>
+                  <td><%= treatment.treatmentDesc %></td>
+                  <td><%= treatment.treatmentDuration %></td>
+                  <td><%= treatment.treatmentStatus %></td>
+                  <td><a class="btn btn-primary btn-sm" href="/admin/treatment/<%= treatment._id %>">Edit</a></td>
+                </tr>
+              <% }) %>
+              <% if (!treatments.length) { %>
+                <tr><td colspan="6">No treatments yet.</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+          <div class="long-input" style="align-items: flex-end; margin-bottom: 25px">
+            <a class="btn btn-primary" href="/admin/treatment/create">New Treatment</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<%- include('includes/footer') %>

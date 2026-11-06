@@ -44,3 +44,14 @@ Update the comment rule in both AGENTS.md files:
 Apply this rule to the treatment code already created. Change comments only; preserve behavior.
 
 Do not commit or push. Suggest a short English commit message.
+
+## Keep Code Simple and Reviewable
+- Prefer simple, direct code that matches existing project examples.
+- Use clear names, readable if blocks, and braces.
+- Avoid long combined conditions, nested ternaries, and flag-based methods that mix different operations.
+- Do not add unnecessary abstractions, wrappers, files, or duplicate logic.
+- Reuse existing helpers and schema validation where appropriate.
+- Preserve necessary validation, authorization, and upload safety.
+- Before finishing, review all code added for the current task and simplify unnecessary complexity.
+- Keep diffs focused; do not rewrite or reformat unrelated code.
+- Explain changes briefly, grouped by file, so the user can review them easily.

@@ -4,6 +4,7 @@ const routerAdmin = express.Router();
 import restaurantController from './controllers/restaurant.controller'
 import productController from './controllers/product.controller';
 import makeUploader from './libs/utils/uploader';
+import treatmentController from './controllers/treatment.controller';
 routerAdmin.get("/", restaurantController.goHome);
 routerAdmin
     .get("/login", restaurantController.getLogin) // CALL
@@ -28,5 +29,19 @@ routerAdmin.post("/product/:id",
 /* USER*/
 routerAdmin.get("/user/all", restaurantController.verifyRestaurant, restaurantController.getUser)
 routerAdmin.post("/user/edit", restaurantController.verifyRestaurant, restaurantController.updateChosenUser)
+
+/* Treatment */
+// Xizmatlar jadvalini faqat admin uchun ochish
+routerAdmin.get("/treatment/all", restaurantController.verifyRestaurant, treatmentController.getAllTreatments);
+// Yaratish formasini autentifikatsiyadan keyin ko'rsatish
+routerAdmin.get("/treatment/create", restaurantController.verifyRestaurant, treatmentController.getCreateTreatment);
+// Rasm yuklash va yangi xizmat yaratishni admin bilan cheklash
+routerAdmin.post("/treatment/create", restaurantController.verifyRestaurant,
+    treatmentController.uploadTreatmentImages, treatmentController.createNewTreatment);
+// Tahrirlash so'rovini himoyalangan controllerga yo'naltirish
+routerAdmin.get("/treatment/:id", restaurantController.verifyRestaurant, treatmentController.getEditTreatment);
+// Yangilash va rasm yuklashdan oldin admin huquqini tekshirish
+routerAdmin.post("/treatment/:id", restaurantController.verifyRestaurant,
+    treatmentController.uploadTreatmentImages, treatmentController.updateChosenTreatment);
 
 export default routerAdmin;

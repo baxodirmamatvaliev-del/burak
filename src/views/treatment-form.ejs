@@ -1,0 +1,60 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" type="text/css" href="/css/products.css" />
+
+<body>
+  <div class="products-container">
+    <%- include('includes/treatment-navigation') %>
+    <div class="restaurant-menu-frame">
+      <div class="board">
+        <form class="dish-container" style="display: flex" method="POST" enctype="multipart/form-data"
+          action="<%= treatmentId ? '/admin/treatment/' + encodeURIComponent(treatmentId) : '/admin/treatment/create' %>">
+          <div class="long-input" style="align-items: center">
+            <span class="new-dish-txt"><%= treatmentId ? 'EDIT TREATMENT' : 'NEW TREATMENT' %></span>
+          </div>
+          <% if (message) { %>
+            <div class="alert alert-danger" role="alert"><%= message %></div>
+          <% } %>
+          <div class="long-input">
+            <label for="treatment-name">Korean treatment name / 진료명</label>
+            <input id="treatment-name" name="treatmentName" value="<%= treatment.treatmentName || '' %>" required />
+          </div>
+          <div class="long-input">
+            <label for="treatment-desc">Description / 설명</label>
+            <textarea id="treatment-desc" name="treatmentDesc" required><%= treatment.treatmentDesc || '' %></textarea>
+          </div>
+          <div class="half-input-frame">
+            <div class="half-input">
+              <label for="treatment-duration">Duration in minutes / 소요 시간(분)</label>
+              <input id="treatment-duration" name="treatmentDuration" type="number" min="1" step="1"
+                value="<%= treatment.treatmentDuration || '' %>" required />
+            </div>
+            <div class="half-input">
+              <label for="treatment-status">Status / 상태</label>
+              <select id="treatment-status" name="treatmentStatus" required>
+                <option value="ACTIVE" <%= treatment.treatmentStatus === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
+                <option value="INACTIVE" <%= treatment.treatmentStatus === 'INACTIVE' ? 'selected' : '' %>>INACTIVE</option>
+              </select>
+            </div>
+          </div>
+          <div class="long-input">
+            <label for="treatment-images">Images: up to 5 JPG/PNG files, 5 MB each</label>
+            <% if (treatmentId) { %>
+              <p class="text-light">Leave empty to keep current images. New uploads replace the image list.</p>
+            <% } %>
+            <input id="treatment-images" name="treatmentImages" type="file" accept="image/jpeg,image/png" multiple />
+          </div>
+          <div class="media-frame">
+            <% (treatment.treatmentImages || []).forEach(function(image) { %>
+              <div class="upload-img-box"><img src="/<%= image %>" alt="Treatment image" /></div>
+            <% }) %>
+          </div>
+          <div class="operation-buttons">
+            <a class="btn btn-danger" href="/admin/treatment/all">Cancel</a>
+            <button class="btn btn-primary" type="submit"><%= treatmentId ? 'Save' : 'Create' %></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+<%- include('includes/footer') %>
