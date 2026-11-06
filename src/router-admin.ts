@@ -5,6 +5,7 @@ import restaurantController from './controllers/restaurant.controller'
 import productController from './controllers/product.controller';
 import makeUploader from './libs/utils/uploader';
 import treatmentController from './controllers/treatment.controller';
+import dentistController from './controllers/dentist.controller';
 routerAdmin.get("/", restaurantController.goHome);
 routerAdmin
     .get("/login", restaurantController.getLogin) // CALL
@@ -43,5 +44,9 @@ routerAdmin.get("/treatment/:id", restaurantController.verifyRestaurant, treatme
 // Yangilash va rasm yuklashdan oldin admin huquqini tekshirish
 routerAdmin.post("/treatment/:id", restaurantController.verifyRestaurant,
     treatmentController.uploadTreatmentImages, treatmentController.updateChosenTreatment);
+
+/* Dentist */
+// Stomatologlar jadvalini faqat autentifikatsiyadan o'tgan admin uchun ochish
+routerAdmin.get("/dentist/all", restaurantController.verifyRestaurant, dentistController.getAllDentists);
 
 export default routerAdmin;

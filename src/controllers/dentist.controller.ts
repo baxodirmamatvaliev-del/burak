@@ -54,4 +54,20 @@ dentistController.getDentist = async (req: Request, res: Response) => {
     }
 };
 
+// Stomatologlar ro'yxatini olib, admin jadvalini EJS orqali ko'rsatish
+dentistController.getAllDentists = async (req: Request, res: Response) => {
+    try {
+        console.log("getAllDentists");
+        const result = await dentistService.getAllDentists();
+        res.render("dentists", { dentists: result });
+    } catch (err) {
+        console.log("ERROR, getAllDentists:", err);
+        if (err instanceof Errors) {
+            res.status(err.code).json(err);
+        } else {
+            res.status(Errors.standart.code).json(Errors.standart);
+        }
+    }
+};
+
 export default dentistController;

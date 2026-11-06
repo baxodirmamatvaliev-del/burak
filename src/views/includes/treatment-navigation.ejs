@@ -1,9 +1,11 @@
+<% const page = typeof activePage === 'undefined' ? 'treatments' : activePage; %>
 <div class="navigation-menu">
   <ul class="nav justify-content-center">
     <li class="nav-item"><a class="nav-link" href="/admin">Home</a></li>
     <li class="nav-item"><a class="nav-link" href="/admin/product/all">Menu</a></li>
     <li class="nav-item"><a class="nav-link" href="/admin/user/all">Users</a></li>
-    <li class="nav-item"><a class="nav-link active" href="/admin/treatment/all">Treatments</a></li>
+    <li class="nav-item"><a class="nav-link <%= page === 'treatments' ? 'active' : '' %>" href="/admin/treatment/all">Treatments</a></li>
+    <li class="nav-item"><a class="nav-link <%= page === 'dentists' ? 'active' : '' %>" href="/admin/dentist/all">Dentists</a></li>
     <li class="nav-item" onclick="return confirm('Do you want to logout?')">
       <a class="nav-link" href="/admin/logout">Logout</a>
     </li>

@@ -1,7 +1,7 @@
 import { shapeIntMongooseObjectId } from "../libs/config";
 import { DentistStatus } from "../libs/enums/dentist.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
-import { DentistInquiry, DentistProfile } from "../libs/types/dentist";
+import { Dentist, DentistInquiry, DentistProfile } from "../libs/types/dentist";
 import DentistModel from "../schema/Dentist.model";
 
 const publicProfileFields = "_id dentistName dentistSpecialty dentistIntro dentistImage treatmentIds";
@@ -32,6 +32,12 @@ class DentistService {
             .lean<DentistProfile[]>()
             .exec();
 
+        return result;
+    }
+
+    // Admin jadvali uchun barcha holatdagi stomatologlarni olish
+    public async getAllDentists(): Promise<Dentist[]> {
+        const result = await this.dentistModel.find().sort({ createdAt: -1, _id: 1 }).exec();
         return result;
     }
 

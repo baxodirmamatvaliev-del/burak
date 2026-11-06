@@ -1,0 +1,39 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" type="text/css" href="/css/products.css" />
+
+<body>
+  <div class="products-container">
+    <%- include('includes/treatment-navigation', { activePage: 'dentists' }) %>
+    <div class="restaurant-menu-frame">
+      <div class="board">
+        <div class="dishes-table">
+          <span class="new-dish-txt" style="margin-bottom: 30px">DENTISTS / 의료진 관리</span>
+          <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+              <tr>
+                <th>No</th>
+                <th>Name</th>
+                <th>Specialty</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody style="background: white">
+              <% dentists.forEach(function(dentist, index) { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= dentist.dentistName %></td>
+                  <td><%= dentist.dentistSpecialty %></td>
+                  <td><%= dentist.dentistStatus %></td>
+                </tr>
+              <% }) %>
+              <% if (!dentists.length) { %>
+                <tr><td colspan="4">No dentists yet.</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<%- include('includes/footer') %>
