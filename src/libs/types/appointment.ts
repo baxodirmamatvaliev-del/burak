@@ -22,6 +22,11 @@ export interface AppointmentInput {
     appointmentStatus?: AppointmentStatus;
 }
 
+export interface AppointmentInquiry {
+    page: number;
+    limit: number;
+}
+
 export interface AppointmentUpdateInput {
     patientId?: ObjectId;
     dentistId?: ObjectId;

@@ -24,6 +24,7 @@ export enum Message {
     INVALID_DENTIST_INPUT = "Invalid dentist details",
     INVALID_DENTIST_TREATMENTS = "Select valid, existing treatments without duplicates",
     INVALID_DENTIST_IMAGE = "Upload one JPG or PNG image, at most 5 MB",
+    INVALID_APPOINTMENT_QUERY = "Invalid appointment query",
 
     USED_NICK_PHONE = "You are inserting already used nick or phone!",
     NO_MEMBER_NICK = "No member with that member nick!",
