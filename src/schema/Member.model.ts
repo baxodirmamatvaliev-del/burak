@@ -1,34 +1,34 @@
-import mongoose, { Schema } from "mongoose";
-import { MemberStatus, MemberType } from "../libs/enums/member.enum";
- // Schema firt & code first
-const memberSchema = new Schema({
+import mongoose, { mongo, Schema } from 'mongoose';
+import { MemberStatus, MemberType } from '../libs/enums/member.enum'
+
+const MemberSchema = new Schema({
     memberType: {
         type: String,
-        enum: MemberType,
+        enum: MemberType,           // aniq qiymat qabul qiladi
         default: MemberType.USER
-    }, 
+    },
+
     memberStatus: {
         type: String,
         enum: MemberStatus,
         default: MemberStatus.ACTIVE
     },
 
-
     memberNick: {
         type: String,
-        index: { unique: true, sparse: true },
-        required: true,
+        index: { unique: true, sparse: true },     // unique qollaymiz chunki boshqa odam bizni nicknamedan kiraoilmasligi kerak
+        required: true
     },
 
     memberPhone: {
         type: String,
         index: { unique: true, sparse: true },
-        required: true,
+        required: true
     },
 
     memberPassword: {
         type: String,
-        select: false,
+        select: false,      // passwordni kiritayotgandsa login qilayotganda passwordni bermaslik uchun false manual kiritishi kerak 
         required: true
     },
 
@@ -39,7 +39,7 @@ const memberSchema = new Schema({
     memberDesc: {
         type: String,
     },
-        
+
     memberImage: {
         type: String,
     },
@@ -47,8 +47,10 @@ const memberSchema = new Schema({
     memberPoints: {
         type: Number,
         default: 0,
-    },
-}, { timestamps: true });  // updatedAt, updatedAt
+    }
 
 
-export default mongoose.model('Member', memberSchema);
+}, { timestamps: true })   // updatedAt va createdAt
+
+
+export default mongoose.model("Member", MemberSchema)

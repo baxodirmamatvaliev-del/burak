@@ -1,10 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import {
-    ProductCollection,
-    ProductSize,
-    ProductStatus,
-    ProductVolume,
-} from "../libs/enums/product.enum";
+import { ProductCollection, ProductSize, ProductStatus, ProductVolume } from "../libs/enums/product.enum";
 
 const productSchema = new Schema(
     {
@@ -13,7 +8,7 @@ const productSchema = new Schema(
             enum: ProductStatus,
             default: ProductStatus.PAUSE,
         },
-        
+
         productCollection: {
             type: String,
             enum: ProductCollection,
@@ -39,7 +34,6 @@ const productSchema = new Schema(
             type: String,
             enum: ProductSize,
             default: ProductSize.NORMAL,
-
         },
 
         productVolume: {
@@ -50,23 +44,25 @@ const productSchema = new Schema(
 
         productDesc: {
             type: String,
-          },
+        },
 
         productImages: {
             type: [String],
-            default: []
+            default: [],
         },
 
         productViews: {
             type: Number,
             default: 0,
         },
-    },
-    { timestamps: true }
-);
 
 
-productSchema.index({ productName: 1, productSize: 1, productVolume: 1 },
-    { unique: true }
-);
-export default mongoose.model('Product', productSchema);
+
+    }, { timestamps: true })   // updatedAt va createdAt
+
+
+productSchema.index(
+    { productName: 1, productSize: 1, productVolume: 1 },
+    { unique: true })
+
+export default mongoose.model("Product", productSchema)

@@ -1,92 +1,144 @@
-import { shapeIntoMongooseObjectId } from "../libs/config";
-import Errors, { HttpCode, Message } from "../libs/Error";
+import Errors, { HttpCode, Message } from "../libs/Errors";
 import { Product, ProductInput, ProductInquiry, ProductUpdateInput } from "../libs/types/product";
+import { shapeIntMongooseObjectId } from "../libs/config";
 import ProductModel from "../schema/Product.model";
-import { FilterQuery } from "mongoose";
+import { T } from "../libs/types/common";
 import { ProductCollection, ProductStatus } from "../libs/enums/product.enum";
+import { ObjectId } from "mongoose";
+import ViewService from "./View.service";
+import { ViewInput } from "../libs/types/view";
+import { ViewGroup } from "../libs/enums/view.enum";
+
 
 class ProductService {
     private readonly productModel;
+    public viewService;
 
     constructor() {
         this.productModel = ProductModel;
+        this.viewService = new ViewService()
+    }
+    /* SPA */
+
+
+   public async getProducts(inquiry: ProductInquiry): Promise<Product[]> {
+    console.log("inquiry:", inquiry);
+    if (
+        !Number.isSafeInteger(inquiry.page) || inquiry.page < 1 || inquiry.page > 1000000 ||
+        !Number.isSafeInteger(inquiry.limit) || inquiry.limit < 1 || inquiry.limit > 100 ||
+        !["createdAt", "productViews", "productPrice"].includes(inquiry.order) ||
+        (inquiry.productCollection !== undefined && !Object.values(ProductCollection).includes(inquiry.productCollection)) ||
+        (inquiry.search !== undefined && (typeof inquiry.search !== "string" || inquiry.search.length > 100))
+    ) throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_PRODUCT_QUERY);
+
+    const match: T = {productStatus: ProductStatus.PROCESS}
+
+    if(inquiry.productCollection) 
+        match.productCollection = inquiry.productCollection;
+    if(inquiry.search) {
+        match.productName = {
+            $regex: inquiry.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            $options: "i",
+        };
     }
 
-    /*SPA */
-    public async getProducts(input: ProductInquiry): Promise<Product[]> {
-        const { page = "1", limit = "8", order = "createdAt", productCollection, search } = input;
-        if (
-            typeof page !== "string" || !/^\d+$/.test(page) ||
-            typeof limit !== "string" || !/^\d+$/.test(limit) ||
-            typeof order !== "string" || !["createdAt", "productViews", "productPrice"].includes(order) ||
-            (productCollection !== undefined &&
-                (typeof productCollection !== "string" || !Object.values(ProductCollection).includes(productCollection))) ||
-            (search !== undefined && (typeof search !== "string" || search.length > 100))
-        ) throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_PRODUCT_QUERY);
+    const sort: T = 
+    inquiry.order === 
+    "productPrice" ?     // narxi eng arzon bolgan narxdan yuqori bolgan productni olib ber degani!
+     {[inquiry.order]: 1, _id: 1} :  // [] <--- stringni key ga aylantirib berar ekan.
+     {[inquiry.order]: -1, _id: 1};
 
-        const pageNumber = Number(page), limitNumber = Number(limit);
-        if (
-            !Number.isSafeInteger(pageNumber) || pageNumber < 1 || pageNumber > 1000000 ||
-            limitNumber < 1 || limitNumber > 100
-        ) throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_PRODUCT_QUERY);
+     const result = await this.productModel.aggregate([
+        { $match: match }, // PROCESS da bolgan productni topib ber!
+        { $sort: sort },
+        { $skip: (inquiry.page*1 -1)*inquiry.limit },  // nechtadir malumotni otkazish. (0)
+        { $limit: inquiry.limit *1 },                  // limit 3 ta malumotni olib ber
+     ]).exec();
 
-        const query: FilterQuery<Product> = { productStatus: ProductStatus.PROCESS };
-        if (productCollection) query.productCollection = productCollection;
-        if (search) {
-            query.productName = {
-                $regex: search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-                $options: "i",
-            };
-        }
+     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
-        const result = await this.productModel.find(query)
-            .sort({ [order]: order === "productPrice" ? 1 : -1, _id: 1 })
-            .skip((pageNumber - 1) * limitNumber)
-            .limit(limitNumber)
-            .exec();
+    return result;
+   }
+
+   public async getProduct(memberId: ObjectId | null, id: string ): Promise<Product> {
+     const productId = shapeIntMongooseObjectId(id);
+
+     let result = await this.productModel.findOne
+     ({_id: productId, productStatus: ProductStatus.PROCESS})
+     .exec();
+
+     if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+   
+     if(memberId) {
+      //TODO:  first => view log creation 
+
+      // chek  Existence
+      const input: ViewInput = {
+        memberId: memberId,
+        viewRefId: productId,
+        viewGroup: ViewGroup.PRODUCT
+      }
+      const existView = await this.viewService.checkViewExistence(input);
+      console.log("exist", !!existView)
+      if(!existView) {
+         // Insert View
+        console.log("PLANNING TO INSERT NEW VIEW");
+        await this.viewService.insertMemberView(input);
+              // Increase Counts
+             result = await this.productModel.
+              findByIdAndUpdate(productId,
+                {$inc: {productviews: +1} }, 
+                {new: true}).exec();
+      }
+
+     }
+
+     return result;
+   }
+
+
+    /* SSR */
+
+    public async getAllProducts(): Promise<Product[]> {
+
+        const result = await this.productModel.find().exec()
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND)
+
         return result;
     }
-    
-    /*SSR */
 
-        public async getAllProducts(): Promise<Product[]> {
-        const result = await this.productModel.find().exec();
-        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
-      
-        return result;
-            
-        
-    }
+
 
     public async createNewProduct(input: ProductInput): Promise<Product> {
-         try {
-             return await this.productModel.create(input);
-    } 
-         catch (err) {
-             console.log("Error, model:createNewProduct:", err);
-      // Provide error details and a status code to Errors constructor
-      throw new Errors(HttpCode.BAD_REQUEST, Message.CREATED_FAILED);
-    }
+        try {
+            return await this.productModel.create(input)
+        } catch (err) {
+            console.error("Error, model: createNewProduct", err)
+            throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+        }
+
     }
 
 
-    public async updateChosenProduct(
-        id: string,
-        input: ProductUpdateInput): Promise<Product> {
-        // string => ObjectId
-        id = shapeIntoMongooseObjectId(id);                       // search query, qanday ozgartiramiz, qanday malumotni qaytarsin
+    public async updateChosenProduct(id: string, input: ProductUpdateInput): Promise<Product> {
+        // string ==> onjectID
+        id = shapeIntMongooseObjectId(id);
         const result = await this.productModel.findOneAndUpdate({ _id: id }, input, { new: true }).exec();
-        if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.UPDATE_FAILED);
 
-      
+        console.log("RESULT", result)
         return result;
-            
-        
     }
 
 }
 
-  
+
 
 export default ProductService;
+
+function getProduct() {
+    throw new Error("Function not implemented.");
+}
+

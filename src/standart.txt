@@ -1,0 +1,4 @@
+Project Standart:
+    - Logging Standarts
+    - Naming Standarts
+    - Error handling 

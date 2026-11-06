@@ -1,86 +1,141 @@
-import express, { Request, Response } from "express";
-import Errors, { HttpCode, Message } from "../libs/Error";
+import Errors, { HttpCode, Message } from "../libs/Errors";
 import { T } from "../libs/types/common";
+import { Request, Response } from 'express';
 import ProductService from "../models/Product.service";
 import { ProductInput, ProductInquiry } from "../libs/types/product";
-import { AdminRequest } from "../libs/types/member";
+import { AdminRequest, ExtendedRequest } from "../libs/types/member";
+import { ProductCollection } from "../libs/enums/product.enum";
+// import { AdminRequest } from "../libs/types/member";
 
-
-const productService = new ProductService();
-
+const productService = new ProductService;
 const productController: T = {};
-/*SPA */
-productController.getProducts = async (req: Request, res: Response) => {
-  try {
-    console.log("getProducts");
-    const input: ProductInquiry = req.query;
-    const result = await productService.getProducts(input);
 
-    res.status(HttpCode.OK).json(result);
-  } catch (err) {
-    console.log("Error, getProducts:", err);
-    if (err instanceof Errors) res.status(err.code).json(err);
-    else res.status(Errors.standart.code).json(Errors.standart);
-  }
-};
-    
-/*SSR */
-    
+// SPA
+productController.getProducts = async ( req: Request,  res: Response) => {
+     try {
+        console.log("getProducts");
+        // const query = req.query;
+        // console.log("req.query:", query);   //QISQACHA: // Query URL orqali serverga nima kerakligini aytish
+
+        // const params = req.params;
+        // console.log("req.params:",params)
+
+
+        const { page = "1", limit = "8", order = "createdAt", productCollection, search } = req.query;
+        if (
+            typeof page !== "string" || !/^\d+$/.test(page) ||
+            typeof limit !== "string" || !/^\d+$/.test(limit) ||
+            typeof order !== "string" ||
+            (productCollection !== undefined && typeof productCollection !== "string") ||
+            (search !== undefined && typeof search !== "string")
+        ) throw new Errors(HttpCode.BAD_REQUEST, Message.INVALID_PRODUCT_QUERY);
+        const inquiry: ProductInquiry = {
+            order: String(order),
+            page: Number(page),
+            limit: Number(limit)
+        };
+      if(productCollection) inquiry.productCollection = productCollection as ProductCollection;
+      if(search) inquiry.search = String(search);
+      const result = await productService.getProducts(inquiry)
+
+      res.status(HttpCode.OK).json(result);
+    } catch (err) {
+        console.log("ERROR, getProducts:", err)
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standart.code).json(Errors.standart);
+    }
+}
+
+productController.getProduct = async (req:ExtendedRequest, res: Response) => {
+        try {
+        console.log("getProduct ");
+        console.log("req.member:",req.member);
+        const id = req.params.id as string;
+        const memberId = req.member?._id ?? null, // req kelayotgan memberning ID sini olib olyapmiz!
+          result = await productService.getProduct(memberId, id);
+          res.status(HttpCode.OK).json(result);
+    } catch (err) {
+        console.log("ERROR, getProduct :", err)
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standart.code).json(Errors.standart);
+    }
+}
+
+// SSR
+
+
 productController.getAllProducts = async (req: Request, res: Response) => {
-  try {
-    console.log("getAllProducts");
-    const data = await productService.getAllProducts();
-  
-    
-    res.render("products", {products: data});
-   } catch (err) {
-      console.log("Error, getAllProducts:", err);
-      if (err instanceof Errors) res.status(err.code).json(err);
-      else res.status(Errors.standart.code).json(Errors.standart);
-  }
+    try {
+        console.log("getAllProducts");
+
+        const data = await productService.getAllProducts();
+        console.log("data", data);
+        // console.log("req.member", req.member)
+
+
+        res.render("products", { products: data });
+    } catch (err) {
+        console.log("ERROR, getAllProducts:", err)
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standart.code).json(Errors.standart);
+    }
+
 };
 
 productController.createNewProduct = async (req: AdminRequest, res: Response) => {
-  try {
-    console.log("createNewProduct");
-     console.log("req.body:", req.body);
-    console.log("req.files:", req.files);
-   
+    try {
+        console.log("createNewProduct");
+        console.log('====================================');
+        console.log("req.files:", req.files);
+        console.log('====================================');
 
-    if (!req.files?.length)
-      throw new Errors(HttpCode.INTERNAL_SEVER_ERROR, Message.CREATED_FAILED); 
+        // console.log(req.files?.length);
 
-    const data: ProductInput = req.body;
-    data.productImages = req.files?.map(ele => {
-      return ele.path.replace(/\\/g, "/");
-    });
+        if (!req.files?.length)
+            throw new Errors(HttpCode.INTERNAL_SERVER_ERROR, Message.CREATE_FAILED);
 
-    await productService.createNewProduct(data);
+        const data: ProductInput = req.body;
+        data.productImages = req.files?.map((ele) => {
+            // console.log("BEFORE", ele.path);
+            // console.log("AFTER", ele.path.replace(/\\/g, '/'));
+            return ele.path.replace(/\\/g, '/');
 
-    res.send(`<script> alert("Successful creation!"); window.location.replace('/admin/product/all') </script>`);
+        })
 
-  } catch (err) {
-    console.log("Error, createNewProduct:", err);
-    const message = err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
-     res.send(`<script> alert("${message}"); window.location.replace('/admin/product/all') </script>`);
-    
-  }
+
+
+        await productService.createNewProduct(data);
+        // console.log("data", data)
+
+        res.send(`<script> alert("Successfully created"); window.location.replace('/admin/product/all')</script>`);
+    } catch (err) {
+        console.log("ERROR, createNewProduct:", err)
+        const message = err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+        res.send(`<script> alert("${message}"); window.location.replace('/admin/product/all')</script>`);
+
+        // console.log("FULL ERROR:", err);
+        // throw err;
+    }
+
 };
 
 productController.updateChosenProduct = async (req: Request, res: Response) => {
-  try {
-    console.log("updateChosenProduct");
-    const id = req.params.id;
+    try {
+        console.log("============BEFORE==============", req);
+        console.log("==========BEFORE PARAM===========", req.params);
 
-    const result = await productService.updateChosenProduct(id as string, req.body);
-    
-    
-    res.status(HttpCode.OK).json({ data: result });
-   } catch (err) {
-      console.log("Error, updateChosenProduct:", err);
-      if (err instanceof Errors) res.status(err.code).json(err);
-      else res.status(Errors.standart.code).json(Errors.standart);
-  }
+        const id = req.params.id as string;
+
+        const result = await productService.updateChosenProduct(id, req.body);
+
+        res.status(HttpCode.OK).json({ data: result })
+    } catch (err) {
+        console.log("ERROR, updateChosenProduct:", err)
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standart.code).json(Errors.standart);
+    }
+
 };
+
 
 export default productController;
